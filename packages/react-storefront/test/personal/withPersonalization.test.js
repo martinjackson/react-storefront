@@ -2,10 +2,10 @@ import React from 'react'
 import { mount } from 'enzyme'
 import { types } from 'mobx-state-tree'
 import AppContext from '../../src/AppContext'
-import { PageContext } from '../../src/Pages'
 import withPersonalization from '../../src/personal/withPersonalization'
 import AppModelBase from '../../src/model/AppModelBase'
 import ProductModelBase from '../../src/model/ProductModelBase'
+import { PageContext } from '../../src/Pages'
 
 describe('withPersonalization', () => {
   let AppModel, ProductModel, loadPersonalization, Test
@@ -31,7 +31,9 @@ describe('withPersonalization', () => {
 
     Test = ({ app }) => (
       <AppContext.Provider value={{ app }}>
-        <Comp />
+        <PageContext.Provider value="Product">
+          <Comp />
+        </PageContext.Provider>
       </AppContext.Provider>
     )
   })
