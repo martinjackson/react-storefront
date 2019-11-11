@@ -77,6 +77,7 @@ yarn release
 ### 6.64.0
 
 - `withPersonalization` will no longer fire the supplied callback unless the parent page component is visible.
+- Added `additionalDelay` option to launch client to further delay hydration after page load.
 
 ### 6.63.0
 

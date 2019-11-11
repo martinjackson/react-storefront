@@ -27,9 +27,10 @@ export default function launchClient({
   target = document.getElementById('root'),
   errorReporter = Function.prototype,
   serviceWorker = true,
-  delayHydrationUntilPageLoad = false
+  delayHydrationUntilPageLoad = false,
+  additionalDelay
 }) {
-  scheduleHydration(delayHydrationUntilPageLoad, () => {
+  scheduleHydration(delayHydrationUntilPageLoad, additionalDelay, () => {
     const history = createBrowserHistory()
 
     hydrate({
@@ -60,9 +61,15 @@ export default function launchClient({
  * @param {Boolean} options.delayHydrationUntilPageLoad If `true` hydration will not occur until the window load event.  This helps improve initial page load time, especially largest image render.
  * @param {Function} delayHydrationUntilPageLoad A function that hydrates the react app
  */
-function scheduleHydration(delayHydrationUntilPageLoad, hydrate) {
+function scheduleHydration(delayHydrationUntilPageLoad, additionalDelay, hydrate) {
   if (delayHydrationUntilPageLoad && document.readyState !== 'complete') {
-    return window.addEventListener('load', hydrate, { once: true })
+    let doHydrate = hydrate
+
+    if (additionalDelay) {
+      doHydrate = setTimeout(hydrate, additionalDelay)
+    }
+
+    return window.addEventListener('load', doHydrate, { once: true })
   } else {
     hydrate()
   }
