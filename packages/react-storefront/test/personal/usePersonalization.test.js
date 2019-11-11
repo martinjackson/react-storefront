@@ -32,9 +32,11 @@ describe('usePersonalization', () => {
       return null
     }
 
-    Test = ({ app }) => (
+    Test = ({ app, page }) => (
       <AppContext.Provider value={{ app }}>
-        <Comp />
+        <PageContext.Provider value={page || app.page}>
+          <Comp />
+        </PageContext.Provider>
       </AppContext.Provider>
     )
   })
@@ -68,6 +70,21 @@ describe('usePersonalization', () => {
     expect(loadPersonalization).not.toHaveBeenCalled()
   })
 
+  it('should not fire unless the page context matches the current page', () => {
+    const app = AppModel.create({ loading: true, page: 'Product' })
+
+    mount(<Test app={app} page="Subcategory" />)
+
+    app.applyState({
+      loading: false,
+      product: {
+        id: '1'
+      }
+    })
+
+    expect(loadPersonalization).not.toHaveBeenCalled()
+  })
+
   it('should not fire if another branch changes', () => {
     const app = AppModel.create({ loading: true, page: 'Product' })
 
@@ -83,7 +100,3 @@ describe('usePersonalization', () => {
     expect(loadPersonalization).not.toHaveBeenCalled()
   })
 })
-
-export default client => async ({ error, app, history }) => {
-  // ...
-}

@@ -2,9 +2,10 @@
  * @license
  * Copyright © 2017-2019 Moov Corporation.  All rights reserved.
  */
-import { useEffect, useContext } from 'react'
+import { useEffect, useContext, useRef } from 'react'
 import AppContext from '../AppContext'
 import { reaction } from 'mobx'
+import { PageContext } from '../Pages'
 
 /**
  * A hook for fetching late-loaded personalized data.  This hook automatically
@@ -25,14 +26,15 @@ import { reaction } from 'mobx'
  */
 export default function usePersonalization(branch) {
   const { app } = useContext(AppContext)
+  const pageContext = useContext(PageContext)
+  const id = useRef(null)
 
-  const loadPersonalization = ready => {
-    const model = branch(app)
-
+  const loadPersonalization = async ({ loading, page, model }) => {
     if (model == null) {
       return
     } else if (model.loadPersonalization) {
-      if (ready) {
+      if (pageContext === page && !loading) {
+        id.current = model.id
         model.loadPersonalization()
       }
     } else {
@@ -42,7 +44,11 @@ export default function usePersonalization(branch) {
     }
   }
 
-  const shouldFetchPersonalization = () => !app.loading && branch(app)
+  const shouldFetchPersonalization = () => ({
+    loading: app.loading,
+    page: app.page,
+    model: branch(app)
+  })
 
   useEffect(() => {
     // check if we should load personalization data immediately as is the case if

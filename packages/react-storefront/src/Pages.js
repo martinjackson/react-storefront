@@ -13,6 +13,8 @@ import Row from './Row'
 import red from '@material-ui/core/colors/red'
 import { waitForServiceWorkerController } from './router/serviceWorker'
 
+export const PageContext = React.createContext()
+
 export const styles = theme => ({
   root: {
     position: 'relative',
@@ -158,13 +160,14 @@ export default class Pages extends Component {
       const entry = this.cache[page]
 
       elements.push(
-        <div
-          key={page}
-          data-page={page}
-          style={{ display: page === app.page && !loading ? 'block' : 'none' }}
-        >
-          {entry.element}
-        </div>
+        <PageContext.Provider value={page} key={page}>
+          <div
+            data-page={page}
+            style={{ display: page === app.page && !loading ? 'block' : 'none' }}
+          >
+            {entry.element}
+          </div>
+        </PageContext.Provider>
       )
     }
 

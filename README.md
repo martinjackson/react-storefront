@@ -74,6 +74,10 @@ yarn release
 
 ## Changelog
 
+### 6.64.0
+
+- `withPersonalization` will no longer fire the supplied callback unless the parent page component is visible.
+
 ### 6.63.0
 
 - Optimized css minification to reduce request handling time.
