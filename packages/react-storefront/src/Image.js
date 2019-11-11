@@ -51,6 +51,54 @@ export const styles = theme => ({
 })
 
 /**
+ * The old image optimizer intented for mobile phones only
+ */
+export const LEGACY_IMAGE_OPTIMIZER = 'https://opt.moovweb.net'
+
+/**
+ * The new image optimizer which supports all device types.
+ */
+export const RESPONSIVE_IMAGE_OPTIMIZER = 'https://optimize.moovweb.net/img'
+
+/**
+ * The new image optimizer running on localhost:8090
+ */
+export const LOCAL_IMAGE_OPTIMIZER = 'http://localhost:8090/img'
+
+let optimizerUrlBase = LEGACY_IMAGE_OPTIMIZER
+
+/**
+ * Changes the base URL for the image optimizer service.
+ * @param {String} url Use LEGACY_IMAGE_OPTIMIZER or RESPONSIVE_IMAGE_OPTIMIZER.
+ */
+export function setImageOptimizer(url) {
+  optimizerUrlBase = url
+}
+
+/**
+ * Creates an optimized image URL
+ * @param {String} src
+ * @param {Object} options
+ * @param {Number} options.height The max height of the image when served to phones
+ * @param {Number} options.width The max width of the image when served to phones
+ * @param {Number} options.quality A number from 1-100 representing the amount to downscale the source image when served to phones
+ * @param {Object} options.format "jpeg" or "webp" If webp is specified, webp will only be served to browsers that support it.
+ * @return {String}
+ */
+export function createOptimizedSrc(src, options = {}) {
+  // The legacy service used fmt, so we kept it for the new responsive service,
+  // but we use "format" here because non of the other options are abbreviated
+  if (options.format) options.fmt = options.format
+
+  if (Object.keys(options).length > 0) {
+    const options = { ...options, img: src }
+    return `${optimizerUrlBase}/?${qs.stringify(options)}`
+  } else {
+    return src
+  }
+}
+
+/**
  * Provide amp-compatible mobile-optimized images that can be made to auto-scale to fit the parent element
  * by setting the `fill` prop, or grow/shrink while maintaining a given aspect ratio
  * by setting the `aspectRatio` prop.
@@ -254,13 +302,6 @@ export default class Image extends Component {
 
   getOptimizedSrc() {
     const { src, quality, optimize } = this.props
-
-    if (quality || Object.keys(optimize).length > 0) {
-      const options = { ...optimize, img: src }
-      if (quality) options.quality = quality
-      return `https://opt.moovweb.net/?${qs.stringify(options)}`
-    } else {
-      return src
-    }
+    return createOptimizedSrc(src, { ...optimize, quality })
   }
 }
