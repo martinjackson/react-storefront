@@ -3,7 +3,7 @@ const chalk = require('chalk')
 module.exports = function checkNodeVersion() {
   const [major] = process.version.substring(1).split(/\./)
 
-  if (major != '8') {
+  if (parseInt(major, 10) < 8)   
     console.log('')
     console.log(`React Storefront requires node v8. You're running node ${process.version}.`)
     console.log('')
